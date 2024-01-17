@@ -113,15 +113,43 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
+    def do_create(self, arg):
+        """ Create an object of any class with given parameters. """
+        args = arg.split()
+        if len(args) < 1:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        class_name = args[0]
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+    
+        new_instance = HBNBCommand.classes[class_name]()
+
+        for param in args[1:]:
+            key_value = param.split('=')
+            if len(key_value) == 2:
+                key, value = key_value
+                # Process the value (string, integer, or float)
+                if value[0] == '"' and value[-1] == '"':  # String value
+                    value = value.strip('"').replace('_', ' ').replace('\\"', '"')
+                elif '.' in value:  # Float value
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        continue
+                else:  # Integer value
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        continue
+
+                # Set the attribute if it exists in the object
+                if hasattr(new_instance, key):
+                    setattr(new_instance, key, value)
+                # Note: If you want to add the attribute even if it's not predefined,
+                # you can directly use setattr without the hasattr check.
+
         storage.save()
         print(new_instance.id)
         storage.save()
