@@ -45,24 +45,6 @@ class DBStorage:
                     objects[key] = obj
         return objects 
 
-    def all(self, cls=None):
-        """Query all objects depending on the class name (cls)"""
-        all_classes = {"State": State, "City": City, "User": User,
-                       "Place": Place, "Review": Review, "Amenity": Amenity}
-        objects = {}
-        if cls:
-            cls = all_classes[cls] if type(cls) == str else cls
-            for obj in self.__session.query(cls).all():
-                key = f"{obj.__class__.__name__}.{obj.id}"
-                objects[key] = obj
-        else:
-            for class_name in all_classes:
-                cls = all_classes[class_name]
-                for obj in self.__session.query(cls).all():
-                    key = f"{obj.__class__.__name__}.{obj.id}"
-                    objects[key] = obj
-        return objects
-
     def new(self, obj):
         """Add the object to the current database session."""
         self.__session.add(obj)
@@ -88,5 +70,9 @@ class DBStorage:
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
+        
+    def close(self):
+        """Close the current SQLAlchemy session."""
+        self.__session.close()
 
 
