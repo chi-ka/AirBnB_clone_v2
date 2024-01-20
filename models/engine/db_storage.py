@@ -43,7 +43,9 @@ class DBStorage:
                 for obj in self.__session.query(cls).all():
                     key = f"{obj.__class__.__name__}.{obj.id}"
                     objects[key] = obj
-        return objects def all(self, cls=None):
+        return objects 
+
+    def all(self, cls=None):
         """Query all objects depending on the class name (cls)"""
         all_classes = {"State": State, "City": City, "User": User,
                        "Place": Place, "Review": Review, "Amenity": Amenity}
